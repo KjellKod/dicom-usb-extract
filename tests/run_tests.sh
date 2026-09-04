@@ -18,7 +18,7 @@ mkdir -p "$DEST"
 cat > "$SOURCE/STUDYLIST.XML" <<'XML'
 <list>
   <com.amicas.viewer.synth.osc.model.CDViewerStudySummary>
-    <itsPatientName>HEDSTROM^TERESSA</itsPatientName>
+    <itsPatientName>SAMPLE^PATIENT</itsPatientName>
     <itsStudyDate>2026-05-14 15:24:43.0 UTC</itsStudyDate>
     <itsStudyDescription>LT WRIST 3V</itsStudyDescription>
     <itsSeriesDescription>WRIST PA</itsSeriesDescription>
@@ -49,7 +49,7 @@ run_extractor() {
 
 run_extractor "$TMP_DIR/NO NAME" "$DEST"
 
-RESULT="$DEST/2026-05-14-Teressa-LT-WRIST-3V"
+RESULT="$DEST/2026-05-14-Patient-LT-WRIST-3V"
 
 test -d "$RESULT/Viewable Images"
 test -d "$RESULT/Original DICOM Files"
@@ -73,7 +73,7 @@ mkdir -p "$APP_DEST"
   --no-ui \
   --no-open
 
-APP_RESULT="$APP_DEST/2026-05-14-Teressa-LT-WRIST-3V"
+APP_RESULT="$APP_DEST/2026-05-14-Patient-LT-WRIST-3V"
 test -d "$APP_RESULT/Viewable Images"
 test -d "$APP_RESULT/Original DICOM Files"
 

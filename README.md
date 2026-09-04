@@ -23,7 +23,7 @@ If macOS says the app cannot be opened because it was downloaded from the intern
 The result will look like:
 
 ```text
-2026-05-14-Teressa-LT-WRIST-3V/
+2026-05-14-Patient-LT-WRIST-3V/
   Viewable Images/
     01-AMSE0001.jpg
     02-AMSE0002.jpg
