@@ -1,14 +1,16 @@
 # DICOM USB Extract
 
-A simple offline Mac tool for safely extracting viewable X-ray images and original DICOM files from medical imaging USB drives without running bundled Windows viewer software.
+A simple offline Apple silicon Mac tool for safely extracting viewable X-ray images and original DICOM files from medical imaging USB drives without running bundled Windows viewer software.
 
 ## Who this is for
 
-Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want the images copied out safely.
+Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Apple silicon Mac users who only want the images copied out safely.
 
 It does not run anything from the USB drive. It only reads the selected folder and copies detected images and DICOM files to a folder you choose.
 
-## How to use it on a Mac
+## How to use it on an Apple silicon Mac
+
+This tool is for Macs with Apple chips, such as M1, M2, M3, M4, and newer. Intel Macs are not a target for this project.
 
 1. Download this repository as a ZIP file and unzip it.
 2. Insert the medical imaging USB drive.
@@ -48,7 +50,7 @@ The result will look like:
 
 ## Notes
 
-This is intentionally Mac-first. It uses built-in macOS shell commands and AppleScript folder picker dialogs, so there are no packages to install.
+This is intentionally Apple silicon Mac-first. It uses built-in macOS shell commands and AppleScript folder picker dialogs, so there are no packages to install and no Rosetta support is needed.
 
 If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, this tool will still copy the original DICOM files. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
 

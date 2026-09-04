@@ -3,6 +3,11 @@ set -euo pipefail
 
 APP_NAME="DICOM USB Extract"
 
+if [ "$(uname -m)" != "arm64" ]; then
+  echo "$APP_NAME is built for Apple silicon Macs only." >&2
+  exit 1
+fi
+
 SOURCE=""
 DESTINATION=""
 NO_UI=0

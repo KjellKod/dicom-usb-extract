@@ -1,6 +1,9 @@
 DICOM USB Extract
 
-For Mac users:
+For Apple silicon Mac users:
+
+This is for Macs with Apple chips, such as M1, M2, M3, M4, and newer.
+Intel Macs are not a target for this project.
 
 1. Insert the medical imaging USB drive.
 2. Double-click DICOM USB Extract.app.
