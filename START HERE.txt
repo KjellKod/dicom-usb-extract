@@ -1,0 +1,18 @@
+DICOM USB Extract
+
+For Mac users:
+
+1. Insert the medical imaging USB drive.
+2. Double-click DICOM USB Extract.app.
+3. Choose the USB drive, the IMAGES folder, or a copied study folder.
+4. Choose where to save the extracted images, such as Pictures.
+
+The app will open the extracted folder when it finishes.
+
+It does not run AutoRun.exe or any other program from the USB drive.
+
+If macOS says the app is from an unidentified developer:
+
+1. Right-click DICOM USB Extract.app.
+2. Choose Open.
+3. Choose Open again.

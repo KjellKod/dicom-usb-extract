@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+APP_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+SCRIPT="$APP_ROOT/src/dicom-usb-extract.sh"
+
+if [ ! -x "$SCRIPT" ]; then
+  osascript -e 'display dialog "The extraction script could not be found. Keep DICOM USB Extract.app in the unzipped repository folder and try again." buttons {"OK"} default button "OK" with title "DICOM USB Extract"' >/dev/null
+  exit 1
+fi
+
+exec "$SCRIPT" "$@"
