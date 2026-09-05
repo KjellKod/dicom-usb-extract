@@ -323,6 +323,10 @@
       <input id="folderInput" type="file" webkitdirectory directory multiple>
       <button id="downloadSelectedButton" type="button" disabled>Download Selected Pictures ZIP</button>
       <button id="downloadAllButton" type="button" disabled>Download All Pictures ZIP</button>
+      <label class="option-row">
+        <input id="includeDicomCheckbox" type="checkbox" disabled>
+        Add original medical files (DICOM) to ZIP
+      </label>
       <span class="status" id="status">No folder selected.</span>
     </section>
 
@@ -366,10 +370,6 @@
       <div class="section-head">
         <h2>Optional Original DICOM Files</h2>
         <div class="select-row">
-          <label class="option-row">
-            <input id="includeDicomCheckbox" type="checkbox">
-            Include originals in ZIP downloads
-          </label>
           <button id="selectDicomButton" type="button" disabled>Select DICOM</button>
           <button id="clearDicomButton" type="button" disabled>Clear DICOM</button>
         </div>
@@ -614,11 +614,14 @@
       const images = state.images.length;
       const dicoms = state.dicoms.length;
       const selected = selectedItems().length;
+      const includeDicoms = els.includeDicomCheckbox.checked && dicoms > 0;
       els.summary.hidden = images + dicoms === 0;
       els.studyName.textContent = state.study.folderName;
       els.imageCount.textContent = String(images);
       els.dicomCount.textContent = String(dicoms);
       els.selectedCount.textContent = String(selected);
+      els.downloadSelectedButton.textContent = includeDicoms ? "Download Selected ZIP" : "Download Selected Pictures ZIP";
+      els.downloadAllButton.textContent = includeDicoms ? "Download All ZIP" : "Download All Pictures ZIP";
       els.downloadSelectedButton.disabled = selected === 0;
       els.downloadAllButton.disabled = allItems().length === 0;
       els.includeDicomCheckbox.disabled = dicoms === 0;

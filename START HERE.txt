@@ -7,7 +7,7 @@ DICOM USB Extract
 5. Download one image, selected pictures, or all pictures as a ZIP.
 
 Original DICOM files are optional. Include them only if a clinician asks for the
-original study files.
+original study files by turning on "Add original medical files (DICOM) to ZIP."
 
 Nothing is uploaded. Nothing from the USB drive is run.
 

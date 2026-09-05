@@ -16,6 +16,7 @@ It does not run anything from the USB drive. It only reads files that you choose
 4. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
 5. Preview the images in the page.
 6. Download one image, selected pictures, or all pictures as a ZIP.
+7. If a clinician asks for the original study files, turn on **Add original medical files (DICOM) to ZIP** before downloading a ZIP.
 
 No Terminal commands are needed. There is no Mac app to approve, no Rosetta prompt, and no notarization requirement.
 
@@ -53,7 +54,7 @@ The page cannot silently save into `Pictures` because browsers block local web p
 
 ## DICOM note
 
-By default, ZIP downloads include pictures only. Original DICOM files are useful when a clinician asks for the original study or when opening the study in a dedicated DICOM viewer, so the page can include them if you opt in.
+By default, ZIP downloads include pictures only. Original DICOM files are useful when a clinician asks for the original study or when opening the study in a dedicated DICOM viewer, so the page can include them if you turn on **Add original medical files (DICOM) to ZIP**.
 
 If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, the page will list the DICOM originals but it cannot preview them as pictures. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
 
