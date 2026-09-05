@@ -177,23 +177,38 @@
       overflow: hidden;
     }
 
+    .image-card {
+      display: flex;
+      flex-direction: column;
+    }
+
     .image-wrap {
       display: grid;
       place-items: center;
-      height: 280px;
+      flex: none;
+      height: clamp(260px, 52vw, 520px);
+      overflow: hidden;
       background: #15181a;
     }
 
     .image-wrap img {
-      width: 100%;
-      height: 100%;
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
     }
 
     .card-body {
       display: grid;
       gap: 10px;
+      position: relative;
+      z-index: 1;
+      flex: none;
       padding: 10px;
+      border-top: 1px solid var(--line);
+      background: var(--panel);
     }
 
     .name-line {
