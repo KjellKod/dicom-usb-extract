@@ -3,8 +3,13 @@
 A simple offline web page for safely previewing and downloading X-ray pictures from medical imaging USB drives without running bundled Windows viewer software.
 
 ## Use it now
+<div align="center">
 
-Use the live page: <https://kjellkod.github.io/dicom-usb-extract/>
+## ✦ [**Use Dicom USB Extract live →**](https://kjellkod.github.io/dicom-usb-extract) ✦
+
+*Client-side conversion, no doc2md upload backend. Local files stay in your browser.*
+
+</div>
 
 Privacy first: the page runs in your browser, reads only the folder you choose, and does not upload or share your files. You can review exactly what it does in this repository: <https://github.com/KjellKod/dicom-usb-extract>
 
