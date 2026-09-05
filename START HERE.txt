@@ -14,8 +14,13 @@ The app will open the extracted folder when it finishes.
 
 It does not run AutoRun.exe or any other program from the USB drive.
 
-If macOS says the app is from an unidentified developer:
+First launch note: this app is not Apple-notarized. If macOS blocks it the first
+time, right-click Open is expected.
+
+If macOS says the app is from an unidentified developer, damaged, or cannot be opened:
 
 1. Right-click DICOM USB Extract.app.
 2. Choose Open.
 3. Choose Open again.
+
+After that, normal double-click launch should work.

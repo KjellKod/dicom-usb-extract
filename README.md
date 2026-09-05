@@ -20,7 +20,7 @@ This tool is for Macs with Apple chips, such as M1, M2, M3, M4, and newer. Intel
 
 No Terminal commands are needed. The app opens normal Mac folder picker dialogs, then opens the extracted folder in Finder when it finishes.
 
-If macOS says the app cannot be opened because it was downloaded from the internet, right-click `DICOM USB Extract.app`, choose **Open**, then choose **Open** again.
+First launch note: this app is not Apple-notarized. If macOS blocks it the first time, right-click `DICOM USB Extract.app`, choose **Open**, then choose **Open** again. After that, normal double-click launch should work.
 
 The result will look like:
 
@@ -53,6 +53,10 @@ The result will look like:
 This is intentionally Apple silicon Mac-first. It uses built-in macOS shell commands and AppleScript folder picker dialogs, so there are no packages to install and no Rosetta support is needed.
 
 If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, this tool will still copy the original DICOM files. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
+
+## Troubleshooting
+
+If macOS says the app is damaged or cannot be opened, make sure you downloaded the latest version. The app bundle is ad-hoc signed so macOS can verify that its contents are internally consistent, but it is not notarized by Apple. A fully notarized one-click first launch would require signing release builds with an Apple Developer ID certificate.
 
 ## Command-line use
 
