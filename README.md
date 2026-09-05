@@ -2,6 +2,12 @@
 
 A simple offline web page for safely previewing and downloading X-ray pictures from medical imaging USB drives without running bundled Windows viewer software.
 
+## Use it now
+
+Use the live page: <https://kjellkod.github.io/dicom-usb-extract/>
+
+Privacy first: the page runs in your browser, reads only the folder you choose, and does not upload or share your files. You can review exactly what it does in this repository: <https://github.com/KjellKod/dicom-usb-extract>
+
 ## Who this is for
 
 Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want to see and copy the images safely.
@@ -10,13 +16,12 @@ It does not run anything from the USB drive. It only reads files that you choose
 
 ## How to use it
 
-1. Download this repository as a ZIP file and unzip it.
+1. Open <https://kjellkod.github.io/dicom-usb-extract/> or double-click `index.html` from a downloaded copy of this repository.
 2. Insert the medical imaging USB drive.
-3. Double-click `index.html`.
-4. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
-5. Preview the images in the page.
-6. Download one image, selected pictures, or all pictures as a ZIP.
-7. If a clinician asks for the original study files, turn on **Add original medical files (DICOM) to ZIP** before downloading a ZIP.
+3. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
+4. Preview the images in the page.
+5. Download one image, selected pictures, or all pictures as a ZIP.
+6. If a clinician asks for the original study files, turn on **Add original medical files (DICOM) to ZIP** before downloading a ZIP.
 
 No Terminal commands are needed. There is no Mac app to approve, no Rosetta prompt, and no notarization requirement.
 

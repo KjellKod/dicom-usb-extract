@@ -1,7 +1,10 @@
 DICOM USB Extract
 
-1. Insert the medical imaging USB drive.
-2. Double-click index.html.
+Live page:
+https://kjellkod.github.io/dicom-usb-extract/
+
+1. Open the live page above, or double-click index.html from this folder.
+2. Insert the medical imaging USB drive.
 3. Choose the USB drive, the IMAGES folder, or a copied study folder.
 4. Preview the images in the page.
 5. Download one image, selected pictures, or all pictures as a ZIP.
@@ -10,5 +13,6 @@ Original DICOM files are optional. Include them only if a clinician asks for the
 original study files by turning on "Add original medical files (DICOM) to ZIP."
 
 Nothing is uploaded. Nothing from the USB drive is run.
+The page runs in your browser and only reads the folder you choose.
 
 There is no Mac app to approve, no Rosetta prompt, and no notarization step.
