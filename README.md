@@ -8,6 +8,8 @@ Use the live page: <https://kjellkod.github.io/dicom-usb-extract/>
 
 Privacy first: the page runs in your browser, reads only the folder you choose, and does not upload or share your files. You can review exactly what it does in this repository: <https://github.com/KjellKod/dicom-usb-extract>
 
+The repository publishes `index.html` to a `gh-pages` branch on every `main` update. If the live link is not active yet, enable GitHub Pages once in the repository settings with source `gh-pages` / root.
+
 ## Who this is for
 
 Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want to see and copy the images safely.
