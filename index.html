@@ -314,7 +314,7 @@
     <header>
       <div>
         <h1>DICOM USB Extract</h1>
-        <p class="lede">Open this page offline, choose the medical USB or its IMAGES folder, preview the viewable X-ray images, then download selected files or the whole study as a ZIP.</p>
+        <p class="lede">Open this page offline, choose the medical USB or its IMAGES folder, preview the viewable X-ray images, then download selected pictures or the whole picture set as a ZIP.</p>
       </div>
     </header>
 
@@ -466,6 +466,10 @@
       return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
     }
 
+    function plural(count, singular, pluralValue = `${singular}s`) {
+      return `${count} ${count === 1 ? singular : pluralValue}`;
+    }
+
     async function readText(file) {
       return await file.text();
     }
@@ -518,21 +522,6 @@
       return false;
     }
 
-    async function collectDirectoryEntries(directoryHandle, prefix = "") {
-      const entries = [];
-      for await (const [name, handle] of directoryHandle.entries()) {
-        const path = prefix ? `${prefix}/${name}` : name;
-        if (ignoredPattern.test(path)) continue;
-        if (handle.kind === "directory") {
-          entries.push(...await collectDirectoryEntries(handle, path));
-        } else if (handle.kind === "file") {
-          const file = await handle.getFile();
-          entries.push({ file, path });
-        }
-      }
-      return entries;
-    }
-
     function collectFileInputEntries(fileList) {
       return Array.from(fileList)
         .map((file) => ({ file, path: fileRelativePath(file) }))
@@ -554,8 +543,10 @@
       revokeObjectUrls();
       state.files = entries;
       state.study = await detectStudy(entries);
+      els.includeDicomCheckbox.checked = false;
 
       const imageEntries = entries
+        .filter((entry) => !ignoredPattern.test(entry.path))
         .filter((entry) => imagePattern.test(entry.path))
         .sort((a, b) => a.path.localeCompare(b.path));
 
@@ -582,7 +573,13 @@
 
       render();
       const found = state.images.length + state.dicoms.length;
-      setStatus(found ? `Found ${found} files.` : "No matching images or DICOM files found.", found ? "ok" : "warn");
+      if (found) {
+        const imageText = plural(state.images.length, "picture");
+        const dicomText = state.dicoms.length ? ` and ${plural(state.dicoms.length, "optional DICOM original")}` : "";
+        setStatus(`Found ${imageText}${dicomText}.`, "ok");
+      } else {
+        setStatus("No matching images or DICOM files found.", "warn");
+      }
     }
 
     function openFolderInput() {
@@ -701,6 +698,7 @@
       const checkbox = document.createElement("input");
       checkbox.type = "checkbox";
       checkbox.checked = item.selected;
+      checkbox.disabled = item.kind === "dicom" && !els.includeDicomCheckbox.checked;
       checkbox.addEventListener("change", () => {
         item.selected = checkbox.checked;
         updateControls();
@@ -863,21 +861,7 @@
     }
 
     els.chooseDirectoryButton.addEventListener("click", async () => {
-      if (!window.showDirectoryPicker) {
-        openFolderInput();
-        return;
-      }
-      try {
-        const handle = await window.showDirectoryPicker({ mode: "read" });
-        setStatus("Scanning selected folder...");
-        await analyze(await collectDirectoryEntries(handle));
-      } catch (error) {
-        if (error.name !== "AbortError") {
-          console.error(error);
-          setStatus("Opening the compatible folder picker instead.", "warn");
-          openFolderInput();
-        }
-      }
+      openFolderInput();
     });
 
     els.folderInput.addEventListener("change", async () => {

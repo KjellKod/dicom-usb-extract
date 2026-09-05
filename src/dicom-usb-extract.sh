@@ -3,13 +3,9 @@ set -euo pipefail
 
 APP_NAME="DICOM USB Extract"
 
-if [ "$(uname -m)" != "arm64" ]; then
-  echo "$APP_NAME is built for Apple silicon Macs only." >&2
-  exit 1
-fi
-
 SOURCE=""
 DESTINATION=""
+INCLUDE_DICOM=0
 NO_UI=0
 OPEN_RESULT=1
 
@@ -23,6 +19,7 @@ Usage:
 Options:
   --source PATH        USB volume, IMAGES folder, or copied medical image folder
   --destination PATH   Parent folder where the extracted study folder is created
+  --include-dicom      Also copy original DICOM files
   --no-ui             Do not show macOS folder picker dialogs
   --no-open           Do not reveal the result in Finder
   --help              Show this help
@@ -38,6 +35,10 @@ while [ "$#" -gt 0 ]; do
     --destination)
       DESTINATION="${2:-}"
       shift 2
+      ;;
+    --include-dicom)
+      INCLUDE_DICOM=1
+      shift
       ;;
     --no-ui)
       NO_UI=1
@@ -197,7 +198,10 @@ OUTPUT_DIR="$DESTINATION/$FOLDER_NAME"
 IMAGE_DIR="$OUTPUT_DIR/Viewable Images"
 DICOM_DIR="$OUTPUT_DIR/Original DICOM Files"
 
-mkdir -p "$IMAGE_DIR" "$DICOM_DIR"
+mkdir -p "$IMAGE_DIR"
+if [ "$INCLUDE_DICOM" -eq 1 ]; then
+  mkdir -p "$DICOM_DIR"
+fi
 
 is_ignored_path() {
   case "$1" in
@@ -252,22 +256,24 @@ while IFS= read -r image_file; do
 done < <(find "$STUDY_ROOT" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.tif' -o -iname '*.tiff' \) -print 2>/dev/null | sort)
 
 DICOM_COUNT=0
-while IFS= read -r candidate; do
-  if is_ignored_path "$candidate"; then
-    continue
-  fi
-  base="$(basename "$candidate")"
-  case "$base" in
-    DICOMDIR|*.htm|*.HTM|*.html|*.HTML|*.xml|*.XML|*.txt|*.TXT|*.css|*.CSS|*.jpg|*.JPG|*.jpeg|*.JPEG|*.png|*.PNG|*.tif|*.TIF|*.tiff|*.TIFF)
+if [ "$INCLUDE_DICOM" -eq 1 ]; then
+  while IFS= read -r candidate; do
+    if is_ignored_path "$candidate"; then
       continue
-      ;;
-  esac
-  if file "$candidate" | grep -qi 'DICOM medical imaging data'; then
-    DICOM_COUNT=$((DICOM_COUNT + 1))
-    parent_label="$(basename "$(dirname "$candidate")")"
-    copy_numbered "$candidate" "$DICOM_DIR" "$DICOM_COUNT" "$(label_for_number "$DICOM_COUNT" "$parent_label")" "dcm"
-  fi
-done < <(find "$STUDY_ROOT" -type f -print 2>/dev/null | sort)
+    fi
+    base="$(basename "$candidate")"
+    case "$base" in
+      DICOMDIR|*.htm|*.HTM|*.html|*.HTML|*.xml|*.XML|*.txt|*.TXT|*.css|*.CSS|*.jpg|*.JPG|*.jpeg|*.JPEG|*.png|*.PNG|*.tif|*.TIF|*.tiff|*.TIFF)
+        continue
+        ;;
+    esac
+    if file "$candidate" | grep -qi 'DICOM medical imaging data'; then
+      DICOM_COUNT=$((DICOM_COUNT + 1))
+      parent_label="$(basename "$(dirname "$candidate")")"
+      copy_numbered "$candidate" "$DICOM_DIR" "$DICOM_COUNT" "$(label_for_number "$DICOM_COUNT" "$parent_label")" "dcm"
+    fi
+  done < <(find "$STUDY_ROOT" -type f -print 2>/dev/null | sort)
+fi
 
 SUMMARY="$APP_NAME finished.
 
@@ -275,14 +281,14 @@ Saved to:
 $OUTPUT_DIR
 
 Viewable images: $IMAGE_COUNT
-Original DICOM files: $DICOM_COUNT
+Original DICOM files copied: $DICOM_COUNT
 
 Bundled Windows viewers, autorun files, and support assets were skipped."
 
 echo "$SUMMARY"
 
 if [ "$IMAGE_COUNT" -eq 0 ] && [ "$DICOM_COUNT" -eq 0 ]; then
-  show_dialog "No viewable images or DICOM files were found in the selected folder."
+  show_dialog "No viewable images were found in the selected folder."
   exit 1
 fi
 

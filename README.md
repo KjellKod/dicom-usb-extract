@@ -65,3 +65,9 @@ The old shell extractor is still included for technical users:
 ```bash
 src/dicom-usb-extract.sh --source "/Volumes/NO NAME" --destination "$HOME/Pictures" --no-ui --no-open
 ```
+
+To include original DICOM files with the pictures:
+
+```bash
+src/dicom-usb-extract.sh --source "/Volumes/NO NAME" --destination "$HOME/Pictures" --include-dicom --no-ui --no-open
+```

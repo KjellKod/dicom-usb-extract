@@ -52,25 +52,40 @@ run_extractor "$TMP_DIR/NO NAME" "$DEST"
 RESULT="$DEST/2026-05-14-Patient-LT-WRIST-3V"
 
 test -d "$RESULT/Viewable Images"
-test -d "$RESULT/Original DICOM Files"
 
 IMAGE_COUNT="$(find "$RESULT/Viewable Images" -type f | wc -l | tr -d ' ')"
-DICOM_COUNT="$(find "$RESULT/Original DICOM Files" -type f | wc -l | tr -d ' ')"
+DICOM_COUNT=0
+if [ -d "$RESULT/Original DICOM Files" ]; then
+  DICOM_COUNT="$(find "$RESULT/Original DICOM Files" -type f | wc -l | tr -d ' ')"
+fi
 
 test "$IMAGE_COUNT" = "2"
-test "$DICOM_COUNT" = "2"
+test "$DICOM_COUNT" = "0"
 test -f "$RESULT/Viewable Images/01-WRIST-PA.jpg"
 test -f "$RESULT/Viewable Images/02-WRIST-OBL.jpg"
-test -f "$RESULT/Original DICOM Files/01-WRIST-PA.dcm"
-test -f "$RESULT/Original DICOM Files/02-WRIST-OBL.dcm"
+test ! -d "$RESULT/Original DICOM Files"
 
 if find "$RESULT" -type f | grep -Eq 'AutoRun|logo'; then
   echo "Copied a skipped viewer or autorun file" >&2
   exit 1
 fi
 
+WITH_DICOM_DEST="$TMP_DIR/output-with-dicom"
+mkdir -p "$WITH_DICOM_DEST"
+"$ROOT_DIR/src/dicom-usb-extract.sh" \
+  --source "$TMP_DIR/NO NAME" \
+  --destination "$WITH_DICOM_DEST" \
+  --include-dicom \
+  --no-ui \
+  --no-open
+
+WITH_DICOM_RESULT="$WITH_DICOM_DEST/2026-05-14-Patient-LT-WRIST-3V"
+test -f "$WITH_DICOM_RESULT/Original DICOM Files/01-WRIST-PA.dcm"
+test -f "$WITH_DICOM_RESULT/Original DICOM Files/02-WRIST-OBL.dcm"
+
 JS_CHECK="$TMP_DIR/index.js"
 perl -0ne 'print $1 if /<script>(.*)<\/script>/s' "$ROOT_DIR/index.html" > "$JS_CHECK"
 node --check "$JS_CHECK" >/dev/null
+node "$ROOT_DIR/tests/browser_logic_test.mjs"
 
 echo "All tests passed"
