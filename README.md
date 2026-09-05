@@ -50,7 +50,7 @@ The downloaded ZIP is organized like this:
 
 The page works entirely offline. Nothing is uploaded.
 
-Browser folder access is intentionally permission-based. If the main folder button does not work in your browser, use the fallback folder button on the page.
+Browser folder access is intentionally permission-based. The page uses the browser's available folder picker and only reads the folder you choose.
 
 The page cannot silently save into `Pictures` because browsers block local web pages from writing wherever they want. Instead, it creates a normal downloaded ZIP.
 

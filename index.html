@@ -297,7 +297,6 @@
 
     <section class="toolbar" aria-label="Actions">
       <button class="primary" id="chooseDirectoryButton" type="button">Choose USB or Folder</button>
-      <label class="file-button" for="folderInput">Choose Folder Fallback</label>
       <input id="folderInput" type="file" webkitdirectory directory multiple>
       <button id="downloadSelectedButton" type="button" disabled>Download Selected ZIP</button>
       <button id="downloadAllButton" type="button" disabled>Download All ZIP</button>
@@ -305,7 +304,7 @@
     </section>
 
     <section class="browser-note" id="browserNote">
-      If the first button does not open a folder picker, use the fallback button. All scanning happens in this browser tab; no files are uploaded.
+      Choose the USB drive, its IMAGES folder, or a copied study folder. All scanning happens in this browser tab; no files are uploaded.
     </section>
 
     <section class="summary" id="summary" hidden>
@@ -556,6 +555,10 @@
       render();
       const found = state.images.length + state.dicoms.length;
       setStatus(found ? `Found ${found} files.` : "No matching images or DICOM files found.", found ? "ok" : "warn");
+    }
+
+    function openFolderInput() {
+      els.folderInput.click();
     }
 
     function revokeObjectUrls() {
@@ -821,7 +824,7 @@
 
     els.chooseDirectoryButton.addEventListener("click", async () => {
       if (!window.showDirectoryPicker) {
-        setStatus("Use the fallback button in this browser.", "warn");
+        openFolderInput();
         return;
       }
       try {
@@ -831,7 +834,8 @@
       } catch (error) {
         if (error.name !== "AbortError") {
           console.error(error);
-          setStatus("Could not read that folder.", "warn");
+          setStatus("Opening the compatible folder picker instead.", "warn");
+          openFolderInput();
         }
       }
     });
