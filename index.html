@@ -66,6 +66,7 @@
       font-size: 17px;
     }
 
+    .privacy-banner,
     .toolbar,
     .summary,
     .empty,
@@ -73,6 +74,33 @@
       background: var(--panel);
       border: 1px solid var(--line);
       border-radius: 8px;
+    }
+
+    .privacy-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .privacy-banner strong {
+      color: var(--ink);
+      font-weight: 700;
+    }
+
+    .privacy-banner a {
+      color: var(--accent);
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .privacy-banner a:hover {
+      text-decoration: underline;
     }
 
     .toolbar {
@@ -306,11 +334,25 @@
       .file-row {
         grid-template-columns: 1fr;
       }
+
+      .privacy-banner {
+        display: block;
+      }
+
+      .privacy-banner a {
+        display: inline-block;
+        margin-top: 6px;
+      }
     }
   </style>
 </head>
 <body>
   <main>
+    <section class="privacy-banner" aria-label="Privacy">
+      <p><strong>Privacy first.</strong> Your files stay in your browser. Nothing is uploaded, shared, or run from the USB drive.</p>
+      <a href="https://github.com/KjellKod/dicom-usb-extract" target="_blank" rel="noreferrer">Review the source</a>
+    </section>
+
     <header>
       <div>
         <h1>DICOM USB Extract</h1>
@@ -331,7 +373,7 @@
     </section>
 
     <section class="browser-note" id="browserNote">
-      Choose the USB drive, its IMAGES folder, or a copied study folder. All scanning happens in this browser tab; no files are uploaded.
+      Choose the USB drive, its IMAGES folder, or a copied study folder.
     </section>
 
     <section class="summary" id="summary" hidden>
