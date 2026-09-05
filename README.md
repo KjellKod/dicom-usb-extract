@@ -1,13 +1,13 @@
-# DICOM USB Extract
+# Image Extract
 
-A simple offline web page for safely previewing and downloading X-ray pictures from medical imaging USB drives without running bundled Windows viewer software.
+A simple offline web page for previewing and downloading image files from any folder, USB drive, phone download folder, or medical DICOM USB without running bundled viewer software.
 
 ## Use it now
 <div align="center">
 
-## ✦ [**Use Dicom USB Extract live →**](https://kjellkod.github.io/dicom-usb-extract) ✦
+## ✦ [**Use Image Extract live →**](https://kjellkod.github.io/dicom-usb-extract) ✦
 
-*Client-side conversion, no doc2md upload backend. Local files stay in your browser.*
+*Privacy first: local files stay in your browser. Nothing is uploaded or shared.*
 
 </div>
 
@@ -17,15 +17,15 @@ The repository publishes `index.html` to a `gh-pages` branch on every `main` upd
 
 ## Who this is for
 
-Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want to see and copy the images safely.
+This is for nontechnical Mac users who want to collect pictures from a folder without digging through confusing file trees. It works with ordinary image folders, copied phone downloads, USB drives, and clinic imaging USBs.
 
-It does not run anything from the USB drive. It only reads files that you choose in your browser, shows the viewable image exports, and downloads selected pictures as a ZIP.
+Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This page does not run anything from the USB drive. It only reads files that you choose in your browser, shows viewable image exports, and downloads selected pictures as a ZIP.
 
 ## How to use it
 
 1. Open <https://kjellkod.github.io/dicom-usb-extract/> or double-click `index.html` from a downloaded copy of this repository.
-2. Insert the medical imaging USB drive.
-3. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
+2. Choose a folder, USB drive, phone download folder, medical imaging USB, or copied study folder.
+3. For clinic USBs, choosing the `IMAGES` folder usually gives the cleanest result.
 4. Preview the images in the page.
 5. Download one image, selected pictures, or all pictures as a ZIP.
 6. If a clinician asks for the original study files, turn on **Add original medical files (DICOM) to ZIP** before downloading a ZIP.
@@ -34,7 +34,7 @@ No Terminal commands are needed. There is no Mac app to approve, no Rosetta prom
 
 ## What appears in the page
 
-- JPEG, PNG, BMP, and GIF images are shown as previews when the USB includes browser-viewable exports.
+- JPEG, PNG, BMP, and GIF images are shown as previews.
 - TIFF files are included for download, but most browsers do not preview TIFF images.
 - Original DICOM files are listed as an optional advanced download.
 
