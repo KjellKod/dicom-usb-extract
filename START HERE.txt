@@ -4,7 +4,10 @@ DICOM USB Extract
 2. Double-click index.html.
 3. Choose the USB drive, the IMAGES folder, or a copied study folder.
 4. Preview the images in the page.
-5. Download one image, selected files, or everything as a ZIP.
+5. Download one image, selected pictures, or all pictures as a ZIP.
+
+Original DICOM files are optional. Include them only if a clinician asks for the
+original study files.
 
 Nothing is uploaded. Nothing from the USB drive is run.
 

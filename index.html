@@ -163,6 +163,14 @@
       align-items: center;
     }
 
+    .option-row {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
@@ -313,8 +321,8 @@
     <section class="toolbar" aria-label="Actions">
       <button class="primary" id="chooseDirectoryButton" type="button">Choose USB or Folder</button>
       <input id="folderInput" type="file" webkitdirectory directory multiple>
-      <button id="downloadSelectedButton" type="button" disabled>Download Selected ZIP</button>
-      <button id="downloadAllButton" type="button" disabled>Download All ZIP</button>
+      <button id="downloadSelectedButton" type="button" disabled>Download Selected Pictures ZIP</button>
+      <button id="downloadAllButton" type="button" disabled>Download All Pictures ZIP</button>
       <span class="status" id="status">No folder selected.</span>
     </section>
 
@@ -337,7 +345,7 @@
       </div>
       <div class="metric">
         <strong id="selectedCount">0</strong>
-        <span>Selected files</span>
+        <span>Selected for ZIP</span>
       </div>
     </section>
 
@@ -356,14 +364,18 @@
 
     <section>
       <div class="section-head">
-        <h2>Original DICOM Files</h2>
+        <h2>Optional Original DICOM Files</h2>
         <div class="select-row">
+          <label class="option-row">
+            <input id="includeDicomCheckbox" type="checkbox">
+            Include originals in ZIP downloads
+          </label>
           <button id="selectDicomButton" type="button" disabled>Select DICOM</button>
           <button id="clearDicomButton" type="button" disabled>Clear DICOM</button>
         </div>
       </div>
       <div class="file-list" id="dicomList">
-        <div class="empty">Original DICOM files will appear here when found.</div>
+        <div class="empty">Original DICOM files will appear here when found. They are not included in ZIP downloads unless you opt in.</div>
       </div>
     </section>
   </main>
@@ -395,6 +407,7 @@
       dicomList: document.getElementById("dicomList"),
       downloadSelectedButton: document.getElementById("downloadSelectedButton"),
       downloadAllButton: document.getElementById("downloadAllButton"),
+      includeDicomCheckbox: document.getElementById("includeDicomCheckbox"),
       selectImagesButton: document.getElementById("selectImagesButton"),
       clearImagesButton: document.getElementById("clearImagesButton"),
       selectDicomButton: document.getElementById("selectDicomButton"),
@@ -563,7 +576,7 @@
       state.dicoms = dicomEntries.map((entry, index) => ({
         ...entry,
         kind: "dicom",
-        selected: true,
+        selected: false,
         downloadPath: outputName(entry, index, "Original DICOM Files", "dcm")
       }));
 
@@ -582,11 +595,19 @@
     }
 
     function selectedItems() {
-      return [...state.images, ...state.dicoms].filter((item) => item.selected);
+      const items = state.images.filter((item) => item.selected);
+      if (els.includeDicomCheckbox.checked) {
+        items.push(...state.dicoms.filter((item) => item.selected));
+      }
+      return items;
     }
 
     function allItems() {
-      return [...state.images, ...state.dicoms];
+      const items = [...state.images];
+      if (els.includeDicomCheckbox.checked) {
+        items.push(...state.dicoms);
+      }
+      return items;
     }
 
     function updateControls() {
@@ -599,11 +620,12 @@
       els.dicomCount.textContent = String(dicoms);
       els.selectedCount.textContent = String(selected);
       els.downloadSelectedButton.disabled = selected === 0;
-      els.downloadAllButton.disabled = images + dicoms === 0;
+      els.downloadAllButton.disabled = allItems().length === 0;
+      els.includeDicomCheckbox.disabled = dicoms === 0;
       els.selectImagesButton.disabled = images === 0;
       els.clearImagesButton.disabled = images === 0;
-      els.selectDicomButton.disabled = dicoms === 0;
-      els.clearDicomButton.disabled = dicoms === 0;
+      els.selectDicomButton.disabled = dicoms === 0 || !els.includeDicomCheckbox.checked;
+      els.clearDicomButton.disabled = dicoms === 0 || !els.includeDicomCheckbox.checked;
     }
 
     function render() {
@@ -651,7 +673,7 @@
     function renderDicoms() {
       els.dicomList.textContent = "";
       if (!state.dicoms.length) {
-        els.dicomList.append(empty("No original DICOM files were found."));
+        els.dicomList.append(empty("No original DICOM files were found. ZIP downloads will contain pictures only."));
         return;
       }
 
@@ -864,6 +886,14 @@
 
     els.downloadSelectedButton.addEventListener("click", () => downloadZip(selectedItems()));
     els.downloadAllButton.addEventListener("click", () => downloadZip(allItems()));
+    els.includeDicomCheckbox.addEventListener("change", () => {
+      if (els.includeDicomCheckbox.checked) {
+        for (const item of state.dicoms) item.selected = true;
+      } else {
+        for (const item of state.dicoms) item.selected = false;
+      }
+      render();
+    });
     els.selectImagesButton.addEventListener("click", () => setSelection(state.images, true));
     els.clearImagesButton.addEventListener("click", () => setSelection(state.images, false));
     els.selectDicomButton.addEventListener("click", () => setSelection(state.dicoms, true));

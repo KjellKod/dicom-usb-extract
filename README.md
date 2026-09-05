@@ -1,12 +1,12 @@
 # DICOM USB Extract
 
-A simple offline web page for safely previewing and downloading X-ray images and original DICOM files from medical imaging USB drives without running bundled Windows viewer software.
+A simple offline web page for safely previewing and downloading X-ray pictures from medical imaging USB drives without running bundled Windows viewer software.
 
 ## Who this is for
 
 Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want to see and copy the images safely.
 
-It does not run anything from the USB drive. It only reads files that you choose in your browser, shows the viewable image exports, and downloads selected files as a ZIP.
+It does not run anything from the USB drive. It only reads files that you choose in your browser, shows the viewable image exports, and downloads selected pictures as a ZIP.
 
 ## How to use it
 
@@ -15,7 +15,7 @@ It does not run anything from the USB drive. It only reads files that you choose
 3. Double-click `index.html`.
 4. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
 5. Preview the images in the page.
-6. Download one image, selected files, or everything as a ZIP.
+6. Download one image, selected pictures, or all pictures as a ZIP.
 
 No Terminal commands are needed. There is no Mac app to approve, no Rosetta prompt, and no notarization requirement.
 
@@ -23,7 +23,7 @@ No Terminal commands are needed. There is no Mac app to approve, no Rosetta prom
 
 - JPEG, PNG, BMP, and GIF images are shown as previews when the USB includes browser-viewable exports.
 - TIFF files are included for download, but most browsers do not preview TIFF images.
-- Original DICOM files are listed for download.
+- Original DICOM files are listed as an optional advanced download.
 
 The downloaded ZIP is organized like this:
 
@@ -32,9 +32,6 @@ The downloaded ZIP is organized like this:
   Viewable Images/
     01-WRIST-PA.jpg
     02-WRIST-OBL.jpg
-  Original DICOM Files/
-    01-WRIST-PA.dcm
-    02-WRIST-OBL.dcm
 ```
 
 ## What it skips
@@ -56,7 +53,9 @@ The page cannot silently save into `Pictures` because browsers block local web p
 
 ## DICOM note
 
-If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, this tool will still include the original DICOM files for download. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
+By default, ZIP downloads include pictures only. Original DICOM files are useful when a clinician asks for the original study or when opening the study in a dedicated DICOM viewer, so the page can include them if you opt in.
+
+If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, the page will list the DICOM originals but it cannot preview them as pictures. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
 
 ## Command-line extractor
 
