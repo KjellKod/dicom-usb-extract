@@ -64,27 +64,13 @@ test -f "$RESULT/Viewable Images/02-WRIST-OBL.jpg"
 test -f "$RESULT/Original DICOM Files/01-WRIST-PA.dcm"
 test -f "$RESULT/Original DICOM Files/02-WRIST-OBL.dcm"
 
-APP_DEST="$TMP_DIR/app-output"
-mkdir -p "$APP_DEST"
-
-"$ROOT_DIR/DICOM USB Extract.app/Contents/MacOS/DICOM USB Extract" \
-  --source "$TMP_DIR/NO NAME" \
-  --destination "$APP_DEST" \
-  --no-ui \
-  --no-open
-
-APP_RESULT="$APP_DEST/2026-05-14-Patient-LT-WRIST-3V"
-test -d "$APP_RESULT/Viewable Images"
-test -d "$APP_RESULT/Original DICOM Files"
-
-IMAGE_COUNT="$(find "$APP_RESULT/Viewable Images" -type f | wc -l | tr -d ' ')"
-DICOM_COUNT="$(find "$APP_RESULT/Original DICOM Files" -type f | wc -l | tr -d ' ')"
-test "$IMAGE_COUNT" = "2"
-test "$DICOM_COUNT" = "2"
-
-if find "$RESULT" "$APP_RESULT" -type f | grep -Eq 'AutoRun|logo'; then
+if find "$RESULT" -type f | grep -Eq 'AutoRun|logo'; then
   echo "Copied a skipped viewer or autorun file" >&2
   exit 1
 fi
+
+JS_CHECK="$TMP_DIR/index.js"
+perl -0ne 'print $1 if /<script>(.*)<\/script>/s' "$ROOT_DIR/index.html" > "$JS_CHECK"
+node --check "$JS_CHECK" >/dev/null
 
 echo "All tests passed"

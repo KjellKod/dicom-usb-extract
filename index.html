@@ -1,0 +1,854 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DICOM USB Extract</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f7f7f4;
+      --ink: #1f2528;
+      --muted: #667075;
+      --line: #d9ddd8;
+      --panel: #ffffff;
+      --accent: #2368b3;
+      --accent-ink: #ffffff;
+      --warn: #8a5b00;
+      --ok: #227447;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 48px;
+    }
+
+    header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0 0 6px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .lede {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .toolbar,
+    .summary,
+    .empty,
+    .browser-note {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      padding: 14px;
+      margin-bottom: 16px;
+    }
+
+    button,
+    .file-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 14px;
+      font: inherit;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    button.primary,
+    .file-button.primary {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: var(--accent-ink);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .browser-note {
+      padding: 12px 14px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-width: 0;
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 22px;
+      line-height: 1.1;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .study-name {
+      grid-column: span 2;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 24px 0 10px;
+    }
+
+    .select-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      gap: 12px;
+    }
+
+    .image-card,
+    .file-row {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .image-wrap {
+      display: grid;
+      place-items: center;
+      height: 280px;
+      background: #15181a;
+    }
+
+    .image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .card-body {
+      display: grid;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    .name-line {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+      min-width: 0;
+    }
+
+    .name-line input {
+      margin-top: 4px;
+      flex: none;
+    }
+
+    .name-line span {
+      overflow-wrap: anywhere;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .row-actions button {
+      min-height: 34px;
+      padding: 0 10px;
+      font-size: 14px;
+    }
+
+    .file-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .file-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px;
+    }
+
+    .file-main {
+      min-width: 0;
+    }
+
+    .empty {
+      padding: 22px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .status {
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .status.ok {
+      color: var(--ok);
+    }
+
+    .status.warn {
+      color: var(--warn);
+    }
+
+    @media (max-width: 720px) {
+      header {
+        display: block;
+      }
+
+      .summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .study-name {
+        grid-column: span 2;
+      }
+
+      .file-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>DICOM USB Extract</h1>
+        <p class="lede">Open this page offline, choose the medical USB or its IMAGES folder, preview the viewable X-ray images, then download selected files or the whole study as a ZIP.</p>
+      </div>
+    </header>
+
+    <section class="toolbar" aria-label="Actions">
+      <button class="primary" id="chooseDirectoryButton" type="button">Choose USB or Folder</button>
+      <label class="file-button" for="folderInput">Choose Folder Fallback</label>
+      <input id="folderInput" type="file" webkitdirectory directory multiple>
+      <button id="downloadSelectedButton" type="button" disabled>Download Selected ZIP</button>
+      <button id="downloadAllButton" type="button" disabled>Download All ZIP</button>
+      <span class="status" id="status">No folder selected.</span>
+    </section>
+
+    <section class="browser-note" id="browserNote">
+      If the first button does not open a folder picker, use the fallback button. All scanning happens in this browser tab; no files are uploaded.
+    </section>
+
+    <section class="summary" id="summary" hidden>
+      <div class="metric study-name">
+        <strong id="studyName">-</strong>
+        <span>Study folder</span>
+      </div>
+      <div class="metric">
+        <strong id="imageCount">0</strong>
+        <span>Viewable images</span>
+      </div>
+      <div class="metric">
+        <strong id="dicomCount">0</strong>
+        <span>DICOM originals</span>
+      </div>
+      <div class="metric">
+        <strong id="selectedCount">0</strong>
+        <span>Selected files</span>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Viewable Images</h2>
+        <div class="select-row">
+          <button id="selectImagesButton" type="button" disabled>Select Images</button>
+          <button id="clearImagesButton" type="button" disabled>Clear Images</button>
+        </div>
+      </div>
+      <div class="grid" id="imageGrid">
+        <div class="empty">Choose a USB drive or study folder to preview images.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-head">
+        <h2>Original DICOM Files</h2>
+        <div class="select-row">
+          <button id="selectDicomButton" type="button" disabled>Select DICOM</button>
+          <button id="clearDicomButton" type="button" disabled>Clear DICOM</button>
+        </div>
+      </div>
+      <div class="file-list" id="dicomList">
+        <div class="empty">Original DICOM files will appear here when found.</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      files: [],
+      images: [],
+      dicoms: [],
+      objectUrls: [],
+      study: {
+        date: "",
+        patient: "Patient",
+        description: "medical-images",
+        folderName: "medical-images"
+      }
+    };
+
+    const els = {
+      chooseDirectoryButton: document.getElementById("chooseDirectoryButton"),
+      folderInput: document.getElementById("folderInput"),
+      status: document.getElementById("status"),
+      summary: document.getElementById("summary"),
+      studyName: document.getElementById("studyName"),
+      imageCount: document.getElementById("imageCount"),
+      dicomCount: document.getElementById("dicomCount"),
+      selectedCount: document.getElementById("selectedCount"),
+      imageGrid: document.getElementById("imageGrid"),
+      dicomList: document.getElementById("dicomList"),
+      downloadSelectedButton: document.getElementById("downloadSelectedButton"),
+      downloadAllButton: document.getElementById("downloadAllButton"),
+      selectImagesButton: document.getElementById("selectImagesButton"),
+      clearImagesButton: document.getElementById("clearImagesButton"),
+      selectDicomButton: document.getElementById("selectDicomButton"),
+      clearDicomButton: document.getElementById("clearDicomButton")
+    };
+
+    const ignoredPattern = /(^|\/)(\.Spotlight-V100|\.fseventsd|System Volume Information|AMICAS)(\/|$)|(^|\/)\._|(^|\/)autorun\.inf$|\.exe$/i;
+    const imagePattern = /\.(jpe?g|png|tiff?|bmp|gif)$/i;
+    const viewablePattern = /\.(jpe?g|png|gif|bmp)$/i;
+
+    function setStatus(message, type = "") {
+      els.status.textContent = message;
+      els.status.className = `status ${type}`.trim();
+    }
+
+    function sanitizeName(value) {
+      const cleaned = String(value || "study")
+        .replace(/<[^>]*>/g, "")
+        .replace(/&nbsp;/gi, " ")
+        .replace(/[^a-z0-9 _.-]+/gi, "-")
+        .replace(/[\s_]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+      return cleaned || "study";
+    }
+
+    function titleCase(value) {
+      const text = String(value || "Patient").toLowerCase();
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
+
+    function fileRelativePath(file) {
+      return file.relativePath || file.webkitRelativePath || file.name;
+    }
+
+    function dirname(path) {
+      const index = path.lastIndexOf("/");
+      return index === -1 ? "" : path.slice(0, index);
+    }
+
+    function basename(path) {
+      const normalized = path.replace(/\/+$/, "");
+      const index = normalized.lastIndexOf("/");
+      return index === -1 ? normalized : normalized.slice(index + 1);
+    }
+
+    function extension(path, fallback) {
+      const name = basename(path);
+      const index = name.lastIndexOf(".");
+      return index === -1 ? fallback : name.slice(index + 1).toLowerCase();
+    }
+
+    function formatBytes(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+      return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    }
+
+    async function readText(file) {
+      return await file.text();
+    }
+
+    function tagValue(xml, tag) {
+      const match = xml.match(new RegExp(`<${tag}>([\\s\\S]*?)<\\/${tag}>`, "i"));
+      return match ? match[1].trim() : "";
+    }
+
+    async function detectStudy(files) {
+      const studyList = files.find((entry) => basename(entry.path).toUpperCase() === "STUDYLIST.XML");
+      let date = new Date().toISOString().slice(0, 10);
+      let patient = "Patient";
+      let description = "medical-images";
+      const seriesLabels = [];
+
+      if (studyList) {
+        try {
+          const xml = await readText(studyList.file);
+          const rawDate = tagValue(xml, "itsStudyDate");
+          const dateMatch = rawDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+          if (dateMatch) date = `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}`;
+
+          const rawPatient = tagValue(xml, "itsPatientName").replace(/\^/g, " ").trim();
+          const patientParts = rawPatient.split(/\s+/).filter(Boolean);
+          patient = titleCase(patientParts[1] || patientParts[0] || "Patient");
+
+          description = tagValue(xml, "itsStudyDescription") || description;
+
+          for (const match of xml.matchAll(/<itsSeriesDescription>([\s\S]*?)<\/itsSeriesDescription>/gi)) {
+            if (match[1].trim()) seriesLabels.push(match[1].trim());
+          }
+        } catch {
+          setStatus("Study metadata could not be read; using generic names.", "warn");
+        }
+      }
+
+      const folderName = sanitizeName(`${date}-${patient}-${description}`);
+      return { date, patient, description, seriesLabels, folderName };
+    }
+
+    async function isDicom(file) {
+      if (/DICOMDIR$/i.test(file.name)) return false;
+      if (/\.(html?|xml|txt|css|jpe?g|png|tiff?|bmp|gif)$/i.test(file.name)) return false;
+      const header = new Uint8Array(await file.slice(0, 132).arrayBuffer());
+      if (header.length >= 132) {
+        const magic = String.fromCharCode(header[128], header[129], header[130], header[131]);
+        return magic === "DICM";
+      }
+      return false;
+    }
+
+    async function collectDirectoryEntries(directoryHandle, prefix = "") {
+      const entries = [];
+      for await (const [name, handle] of directoryHandle.entries()) {
+        const path = prefix ? `${prefix}/${name}` : name;
+        if (ignoredPattern.test(path)) continue;
+        if (handle.kind === "directory") {
+          entries.push(...await collectDirectoryEntries(handle, path));
+        } else if (handle.kind === "file") {
+          const file = await handle.getFile();
+          entries.push({ file, path });
+        }
+      }
+      return entries;
+    }
+
+    function collectFileInputEntries(fileList) {
+      return Array.from(fileList)
+        .map((file) => ({ file, path: fileRelativePath(file) }))
+        .filter((entry) => !ignoredPattern.test(entry.path));
+    }
+
+    function labelFor(index, fallback) {
+      return state.study.seriesLabels[index] || fallback || `file-${index + 1}`;
+    }
+
+    function outputName(entry, index, folder, fallbackExt) {
+      const sourceLabel = basename(dirname(entry.path));
+      const label = labelFor(index, sourceLabel);
+      const ext = extension(entry.path, fallbackExt);
+      return `${state.study.folderName}/${folder}/${String(index + 1).padStart(2, "0")}-${sanitizeName(label)}.${ext}`;
+    }
+
+    async function analyze(entries) {
+      revokeObjectUrls();
+      state.files = entries;
+      state.study = await detectStudy(entries);
+
+      const imageEntries = entries
+        .filter((entry) => imagePattern.test(entry.path))
+        .sort((a, b) => a.path.localeCompare(b.path));
+
+      const dicomEntries = [];
+      for (const entry of entries.sort((a, b) => a.path.localeCompare(b.path))) {
+        if (ignoredPattern.test(entry.path)) continue;
+        if (await isDicom(entry.file)) dicomEntries.push(entry);
+      }
+
+      state.images = imageEntries.map((entry, index) => ({
+        ...entry,
+        kind: "image",
+        selected: true,
+        canPreview: viewablePattern.test(entry.path),
+        downloadPath: outputName(entry, index, "Viewable Images", "jpg")
+      }));
+
+      state.dicoms = dicomEntries.map((entry, index) => ({
+        ...entry,
+        kind: "dicom",
+        selected: true,
+        downloadPath: outputName(entry, index, "Original DICOM Files", "dcm")
+      }));
+
+      render();
+      const found = state.images.length + state.dicoms.length;
+      setStatus(found ? `Found ${found} files.` : "No matching images or DICOM files found.", found ? "ok" : "warn");
+    }
+
+    function revokeObjectUrls() {
+      for (const url of state.objectUrls) URL.revokeObjectURL(url);
+      state.objectUrls = [];
+    }
+
+    function selectedItems() {
+      return [...state.images, ...state.dicoms].filter((item) => item.selected);
+    }
+
+    function allItems() {
+      return [...state.images, ...state.dicoms];
+    }
+
+    function updateControls() {
+      const images = state.images.length;
+      const dicoms = state.dicoms.length;
+      const selected = selectedItems().length;
+      els.summary.hidden = images + dicoms === 0;
+      els.studyName.textContent = state.study.folderName;
+      els.imageCount.textContent = String(images);
+      els.dicomCount.textContent = String(dicoms);
+      els.selectedCount.textContent = String(selected);
+      els.downloadSelectedButton.disabled = selected === 0;
+      els.downloadAllButton.disabled = images + dicoms === 0;
+      els.selectImagesButton.disabled = images === 0;
+      els.clearImagesButton.disabled = images === 0;
+      els.selectDicomButton.disabled = dicoms === 0;
+      els.clearDicomButton.disabled = dicoms === 0;
+    }
+
+    function render() {
+      renderImages();
+      renderDicoms();
+      updateControls();
+    }
+
+    function renderImages() {
+      els.imageGrid.textContent = "";
+      if (!state.images.length) {
+        els.imageGrid.append(empty("No viewable image exports were found."));
+        return;
+      }
+
+      state.images.forEach((item, index) => {
+        const card = document.createElement("article");
+        card.className = "image-card";
+
+        const wrap = document.createElement("div");
+        wrap.className = "image-wrap";
+        if (item.canPreview) {
+          const url = URL.createObjectURL(item.file);
+          state.objectUrls.push(url);
+          const img = document.createElement("img");
+          img.alt = item.downloadPath;
+          img.src = url;
+          wrap.append(img);
+        } else {
+          wrap.textContent = "Preview unavailable";
+          wrap.style.color = "#fff";
+        }
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+        body.append(selectionLine(item, index, "image"));
+        body.append(metaLine(`${formatBytes(item.file.size)} | ${item.path}`));
+        body.append(actions(item));
+
+        card.append(wrap, body);
+        els.imageGrid.append(card);
+      });
+    }
+
+    function renderDicoms() {
+      els.dicomList.textContent = "";
+      if (!state.dicoms.length) {
+        els.dicomList.append(empty("No original DICOM files were found."));
+        return;
+      }
+
+      state.dicoms.forEach((item, index) => {
+        const row = document.createElement("article");
+        row.className = "file-row";
+
+        const main = document.createElement("div");
+        main.className = "file-main";
+        main.append(selectionLine(item, index, "dicom"));
+        main.append(metaLine(`${formatBytes(item.file.size)} | ${item.path}`));
+
+        row.append(main, actions(item));
+        els.dicomList.append(row);
+      });
+    }
+
+    function selectionLine(item, index, type) {
+      const label = document.createElement("label");
+      label.className = "name-line";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = item.selected;
+      checkbox.addEventListener("change", () => {
+        item.selected = checkbox.checked;
+        updateControls();
+      });
+
+      const name = document.createElement("span");
+      name.textContent = basename(item.downloadPath);
+
+      label.append(checkbox, name);
+      return label;
+    }
+
+    function metaLine(text) {
+      const line = document.createElement("div");
+      line.className = "meta";
+      line.textContent = text;
+      return line;
+    }
+
+    function actions(item) {
+      const box = document.createElement("div");
+      box.className = "row-actions";
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.textContent = "Download";
+      button.addEventListener("click", () => downloadBlob(item.file, basename(item.downloadPath)));
+      box.append(button);
+
+      return box;
+    }
+
+    function empty(text) {
+      const node = document.createElement("div");
+      node.className = "empty";
+      node.textContent = text;
+      return node;
+    }
+
+    function setSelection(items, selected) {
+      for (const item of items) item.selected = selected;
+      render();
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function crc32(bytes) {
+      let crc = -1;
+      for (let i = 0; i < bytes.length; i++) {
+        crc ^= bytes[i];
+        for (let bit = 0; bit < 8; bit++) {
+          crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
+        }
+      }
+      return (crc ^ -1) >>> 0;
+    }
+
+    function writeUint16(target, offset, value) {
+      target[offset] = value & 255;
+      target[offset + 1] = (value >>> 8) & 255;
+    }
+
+    function writeUint32(target, offset, value) {
+      target[offset] = value & 255;
+      target[offset + 1] = (value >>> 8) & 255;
+      target[offset + 2] = (value >>> 16) & 255;
+      target[offset + 3] = (value >>> 24) & 255;
+    }
+
+    async function createZip(items) {
+      const encoder = new TextEncoder();
+      const chunks = [];
+      const central = [];
+      let offset = 0;
+
+      for (const item of items) {
+        const data = new Uint8Array(await item.file.arrayBuffer());
+        const nameBytes = encoder.encode(item.downloadPath);
+        const crc = crc32(data);
+
+        const local = new Uint8Array(30 + nameBytes.length);
+        writeUint32(local, 0, 0x04034b50);
+        writeUint16(local, 4, 20);
+        writeUint16(local, 6, 0);
+        writeUint16(local, 8, 0);
+        writeUint16(local, 10, 0);
+        writeUint16(local, 12, 0);
+        writeUint32(local, 14, crc);
+        writeUint32(local, 18, data.length);
+        writeUint32(local, 22, data.length);
+        writeUint16(local, 26, nameBytes.length);
+        writeUint16(local, 28, 0);
+        local.set(nameBytes, 30);
+
+        chunks.push(local, data);
+
+        const centralEntry = new Uint8Array(46 + nameBytes.length);
+        writeUint32(centralEntry, 0, 0x02014b50);
+        writeUint16(centralEntry, 4, 20);
+        writeUint16(centralEntry, 6, 20);
+        writeUint16(centralEntry, 8, 0);
+        writeUint16(centralEntry, 10, 0);
+        writeUint16(centralEntry, 12, 0);
+        writeUint16(centralEntry, 14, 0);
+        writeUint32(centralEntry, 16, crc);
+        writeUint32(centralEntry, 20, data.length);
+        writeUint32(centralEntry, 24, data.length);
+        writeUint16(centralEntry, 28, nameBytes.length);
+        writeUint16(centralEntry, 30, 0);
+        writeUint16(centralEntry, 32, 0);
+        writeUint16(centralEntry, 34, 0);
+        writeUint16(centralEntry, 36, 0);
+        writeUint32(centralEntry, 38, 0);
+        writeUint32(centralEntry, 42, offset);
+        centralEntry.set(nameBytes, 46);
+        central.push(centralEntry);
+
+        offset += local.length + data.length;
+      }
+
+      const centralOffset = offset;
+      let centralSize = 0;
+      for (const entry of central) centralSize += entry.length;
+      chunks.push(...central);
+
+      const end = new Uint8Array(22);
+      writeUint32(end, 0, 0x06054b50);
+      writeUint16(end, 4, 0);
+      writeUint16(end, 6, 0);
+      writeUint16(end, 8, items.length);
+      writeUint16(end, 10, items.length);
+      writeUint32(end, 12, centralSize);
+      writeUint32(end, 16, centralOffset);
+      writeUint16(end, 20, 0);
+      chunks.push(end);
+
+      return new Blob(chunks, { type: "application/zip" });
+    }
+
+    async function downloadZip(items) {
+      if (!items.length) return;
+      setStatus("Preparing ZIP...");
+      try {
+        const zip = await createZip(items);
+        downloadBlob(zip, `${state.study.folderName}.zip`);
+        setStatus(`Prepared ZIP with ${items.length} files.`, "ok");
+      } catch (error) {
+        console.error(error);
+        setStatus("ZIP creation failed.", "warn");
+      }
+    }
+
+    els.chooseDirectoryButton.addEventListener("click", async () => {
+      if (!window.showDirectoryPicker) {
+        setStatus("Use the fallback button in this browser.", "warn");
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: "read" });
+        setStatus("Scanning selected folder...");
+        await analyze(await collectDirectoryEntries(handle));
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          console.error(error);
+          setStatus("Could not read that folder.", "warn");
+        }
+      }
+    });
+
+    els.folderInput.addEventListener("change", async () => {
+      if (!els.folderInput.files.length) return;
+      setStatus("Scanning selected folder...");
+      await analyze(collectFileInputEntries(els.folderInput.files));
+      els.folderInput.value = "";
+    });
+
+    els.downloadSelectedButton.addEventListener("click", () => downloadZip(selectedItems()));
+    els.downloadAllButton.addEventListener("click", () => downloadZip(allItems()));
+    els.selectImagesButton.addEventListener("click", () => setSelection(state.images, true));
+    els.clearImagesButton.addEventListener("click", () => setSelection(state.images, false));
+    els.selectDicomButton.addEventListener("click", () => setSelection(state.dicoms, true));
+    els.clearDicomButton.addEventListener("click", () => setSelection(state.dicoms, false));
+  </script>
+</body>
+</html>

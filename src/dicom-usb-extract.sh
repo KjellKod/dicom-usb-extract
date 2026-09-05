@@ -18,7 +18,6 @@ usage() {
 DICOM USB Extract
 
 Usage:
-  ./Dicom\ USB\ Extract.command
   src/dicom-usb-extract.sh --source /Volumes/NO\ NAME --destination ~/Pictures
 
 Options:

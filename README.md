@@ -1,43 +1,41 @@
 # DICOM USB Extract
 
-A simple offline Apple silicon Mac tool for safely extracting viewable X-ray images and original DICOM files from medical imaging USB drives without running bundled Windows viewer software.
+A simple offline web page for safely previewing and downloading X-ray images and original DICOM files from medical imaging USB drives without running bundled Windows viewer software.
 
 ## Who this is for
 
-Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Apple silicon Mac users who only want the images copied out safely.
+Some clinics hand out USB drives that expect you to run a Windows `AutoRun.exe` viewer. This tool is for Mac users who only want to see and copy the images safely.
 
-It does not run anything from the USB drive. It only reads the selected folder and copies detected images and DICOM files to a folder you choose.
+It does not run anything from the USB drive. It only reads files that you choose in your browser, shows the viewable image exports, and downloads selected files as a ZIP.
 
-## How to use it on an Apple silicon Mac
-
-This tool is for Macs with Apple chips, such as M1, M2, M3, M4, and newer. Intel Macs are not a target for this project.
+## How to use it
 
 1. Download this repository as a ZIP file and unzip it.
 2. Insert the medical imaging USB drive.
-3. Double-click `DICOM USB Extract.app`.
-4. Choose the USB drive, the `IMAGES` folder, or a copied study folder when prompted.
-5. Choose where the extracted folder should be saved, such as `Pictures`.
+3. Double-click `index.html`.
+4. Choose the USB drive, the `IMAGES` folder, or a copied study folder.
+5. Preview the images in the page.
+6. Download one image, selected files, or everything as a ZIP.
 
-No Terminal commands are needed. The app opens normal Mac folder picker dialogs, then opens the extracted folder in Finder when it finishes.
+No Terminal commands are needed. There is no Mac app to approve, no Rosetta prompt, and no notarization requirement.
 
-First launch note: this app is not Apple-notarized. If macOS blocks it the first time, right-click `DICOM USB Extract.app`, choose **Open**, then choose **Open** again. After that, normal double-click launch should work.
+## What appears in the page
 
-The result will look like:
+- JPEG, PNG, BMP, and GIF images are shown as previews when the USB includes browser-viewable exports.
+- TIFF files are included for download, but most browsers do not preview TIFF images.
+- Original DICOM files are listed for download.
+
+The downloaded ZIP is organized like this:
 
 ```text
 2026-05-14-Patient-LT-WRIST-3V/
   Viewable Images/
-    01-AMSE0001.jpg
-    02-AMSE0002.jpg
+    01-WRIST-PA.jpg
+    02-WRIST-OBL.jpg
   Original DICOM Files/
-    01-AMSE0001.dcm
-    02-AMSE0002.dcm
+    01-WRIST-PA.dcm
+    02-WRIST-OBL.dcm
 ```
-
-## What it copies
-
-- JPEG, PNG, and TIFF images that are part of the study
-- Original DICOM image files detected by macOS's `file` command
 
 ## What it skips
 
@@ -48,25 +46,21 @@ The result will look like:
 - macOS metadata files like `._*`
 - Spotlight and filesystem bookkeeping folders
 
-## Notes
+## Browser notes
 
-This is intentionally Apple silicon Mac-first. It uses built-in macOS shell commands and AppleScript folder picker dialogs, so there are no packages to install and no Rosetta support is needed.
+The page works entirely offline. Nothing is uploaded.
 
-If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, this tool will still copy the original DICOM files. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
+Browser folder access is intentionally permission-based. If the main folder button does not work in your browser, use the fallback folder button on the page.
 
-## Troubleshooting
+The page cannot silently save into `Pictures` because browsers block local web pages from writing wherever they want. Instead, it creates a normal downloaded ZIP.
 
-If macOS says the app is damaged or cannot be opened, make sure you downloaded the latest version. The app bundle is ad-hoc signed so macOS can verify that its contents are internally consistent, but it is not notarized by Apple. A fully notarized one-click first launch would require signing release builds with an Apple Developer ID certificate.
+## DICOM note
 
-## Command-line use
+If a USB drive contains DICOM files but no exported JPEG/PNG/TIFF images, this tool will still include the original DICOM files for download. It does not yet convert arbitrary DICOM pixel data into JPEGs because DICOM image encoding varies between clinics and devices.
 
-You can also run it directly:
+## Command-line extractor
 
-```bash
-src/dicom-usb-extract.sh --source "/Volumes/NO NAME" --destination "$HOME/Pictures"
-```
-
-For automated runs:
+The old shell extractor is still included for technical users:
 
 ```bash
 src/dicom-usb-extract.sh --source "/Volumes/NO NAME" --destination "$HOME/Pictures" --no-ui --no-open
